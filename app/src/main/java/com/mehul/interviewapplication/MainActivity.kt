@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
         val repository = QuoteRepository(quoteService)
         mMainViewModel = ViewModelProvider(this, MainViewModelFactory(repository))[MainViewModel::class.java]
 
+        showProgressDialog()
+
         mMainViewModel.mQuotesList.observe(this, { response ->
             if (1 == mCurrentPageCount) mPostResponseList = ArrayList()
             mTotalPageCount = response.totalPages ?: 1
