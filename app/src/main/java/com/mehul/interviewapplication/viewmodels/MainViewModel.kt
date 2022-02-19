@@ -18,4 +18,10 @@ class MainViewModel(private val mRepository: QuoteRepository): ViewModel() {
     val mQuotesList: LiveData<QuoteResponse>
     get() = mRepository.mQuotes
 
+    fun getQuotes(pageNumber: Int) {
+        viewModelScope.launch {
+            mRepository.getQuotes(pageNumber)
+        }
+    }
+
 }
