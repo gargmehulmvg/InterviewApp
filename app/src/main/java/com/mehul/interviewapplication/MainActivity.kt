@@ -16,12 +16,13 @@ import com.mehul.interviewapplication.apis.IAppService
 import com.mehul.interviewapplication.apis.RetrofitHelper
 import com.mehul.interviewapplication.constants.isNotEmpty
 import com.mehul.interviewapplication.databinding.ActivityMainBinding
+import com.mehul.interviewapplication.interfaces.IAdapterItemClickListener
 import com.mehul.interviewapplication.model.ResultsItemResponse
 import com.mehul.interviewapplication.repository.QuoteRepository
 import com.mehul.interviewapplication.viewmodels.MainViewModel
 import com.mehul.interviewapplication.viewmodelsfactory.MainViewModelFactory
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), IAdapterItemClickListener {
 
     private lateinit var mMainViewModel: MainViewModel
     private lateinit var mBinding: ActivityMainBinding
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         mBinding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            mQuotesAdapter = QuotesAdapter(this@MainActivity, null)
+            mQuotesAdapter = QuotesAdapter(this@MainActivity, null, this@MainActivity)
             adapter = mQuotesAdapter
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
@@ -110,6 +111,10 @@ class MainActivity : AppCompatActivity() {
                 Log.e(TAG, "stopProgress: ${e.message}", e)
             }
         }
+    }
+
+    override fun onAdapterItemClickListener(position: Int) {
+        Log.d(TAG, "onAdapterItemClickListener: position :: $position :: item :: ${mPostResponseList?.get(position)}")
     }
 
 }

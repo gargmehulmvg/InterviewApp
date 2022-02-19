@@ -7,11 +7,13 @@ import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.mehul.interviewapplication.R
 import com.mehul.interviewapplication.databinding.QuotesItemBinding
+import com.mehul.interviewapplication.interfaces.IAdapterItemClickListener
 import com.mehul.interviewapplication.model.ResultsItemResponse
 
 class QuotesAdapter(
     private var mContext: Context?,
-    private var mList: ArrayList<ResultsItemResponse?>?
+    private var mList: ArrayList<ResultsItemResponse?>?,
+    private var mListener: IAdapterItemClickListener
 ) : RecyclerView.Adapter<QuotesAdapter.QuotesViewHolder>() {
 
     inner class QuotesViewHolder(val viewDataBinding: QuotesItemBinding) : RecyclerView.ViewHolder(viewDataBinding.root)
@@ -36,6 +38,8 @@ class QuotesAdapter(
                 val animation = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_row_animation)
                 imageView.startAnimation(animation)
             }
+            itemClickListener = mListener
+            adapterPosition = position
             authorName = mList?.get(position)?.author ?: ""
             content = mList?.get(position)?.content ?: ""
             mLastUpdatedPosition = holder.adapterPosition

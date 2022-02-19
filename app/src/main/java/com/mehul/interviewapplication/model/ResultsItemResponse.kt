@@ -21,8 +21,5 @@ data class ResultsItemResponse(
     val author: String? = null,
 
     @field:SerializedName("content")
-    val content: String? = null,
-
-    @field:SerializedName("review")
-    val review: String? = ""
+    val content: String? = null
 )
