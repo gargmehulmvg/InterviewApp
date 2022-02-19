@@ -3,9 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/curve_white_background.xml" value="0.27314814814814814" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/progress_dialog.xml" value="0.3" />
         <entry key="app/src/main/res/layout/quotes_item.xml" value="0.3640625" />
+        <entry key="app/src/main/res/layout/review_dialog.xml" value="0.3640625" />
       </map>
     </option>
   </component>

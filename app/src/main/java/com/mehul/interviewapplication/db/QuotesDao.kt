@@ -2,6 +2,7 @@ package com.mehul.interviewapplication.db
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.mehul.interviewapplication.model.ResultsItemResponse
 import com.mehul.interviewapplication.model.ReviewResponse
@@ -17,5 +18,8 @@ interface QuotesDao {
 
     @Query("SELECT * FROM reviews WHERE post_id=:postId")
     suspend fun getQuoteReviewById(postId: String): ReviewResponse?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertQuoteReview(review: ReviewResponse)
 
 }

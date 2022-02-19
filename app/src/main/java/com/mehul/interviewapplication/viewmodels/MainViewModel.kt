@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.mehul.interviewapplication.interfaces.IQuotesDaoResponse
 import com.mehul.interviewapplication.model.QuoteResponse
 import com.mehul.interviewapplication.model.ResultsItemResponse
+import com.mehul.interviewapplication.model.ReviewResponse
 import com.mehul.interviewapplication.repository.QuoteRepository
 import kotlinx.coroutines.launch
 
@@ -35,6 +36,12 @@ class MainViewModel(private val mRepository: QuoteRepository, private val mDaoIt
     fun getQuoteReviewById(id: String) {
         viewModelScope.launch {
             mRepository.getQuoteReviewById(id, mDaoItemResponse)
+        }
+    }
+
+    fun insertQuoteReview(review: ReviewResponse) {
+        viewModelScope.launch {
+            mRepository.insertQuoteReview(review, mDaoItemResponse)
         }
     }
 

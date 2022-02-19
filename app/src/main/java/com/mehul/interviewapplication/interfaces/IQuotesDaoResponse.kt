@@ -4,6 +4,8 @@ import com.mehul.interviewapplication.model.ReviewResponse
 
 interface IQuotesDaoResponse {
 
-    fun onQuotesReviewResponse(reviewItem: ReviewResponse?)
+    fun onQuotesReviewResponse(reviewItem: ReviewResponse?, quoteId: String)
+
+    fun onInsertQuotesReviewResponse()
 
 }

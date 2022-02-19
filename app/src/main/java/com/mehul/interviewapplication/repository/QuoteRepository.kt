@@ -47,8 +47,12 @@ class QuoteRepository(private val mAppService:IAppService, private val mAppDataB
     suspend fun getQuoteReviewById(id: String, daoItemResponse: IQuotesDaoResponse) {
         Log.d("MainActivity", "getQuoteReviewById: id :: $id")
         val reviewResponse = mAppDataBaseService.getQuotesDao().getQuoteReviewById(id)
-        daoItemResponse.onQuotesReviewResponse(reviewResponse)
+        daoItemResponse.onQuotesReviewResponse(reviewResponse, id)
+    }
 
+    suspend fun insertQuoteReview(review: ReviewResponse, daoItemResponse: IQuotesDaoResponse) {
+        mAppDataBaseService.getQuotesDao().insertQuoteReview(review)
+        daoItemResponse.onInsertQuotesReviewResponse()
     }
 
 }

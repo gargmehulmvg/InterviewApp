@@ -4,14 +4,22 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.provider.SyncStateContract
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputLayout
 import com.mehul.interviewapplication.adapters.QuotesAdapter
+import com.mehul.interviewapplication.constants.CoroutineScopeUtils
+import com.mehul.interviewapplication.constants.isEmpty
 import com.mehul.interviewapplication.constants.isNotEmpty
 import com.mehul.interviewapplication.databinding.ActivityMainBinding
 import com.mehul.interviewapplication.interfaces.IAdapterItemClickListener
@@ -117,8 +125,42 @@ class MainActivity : AppCompatActivity(), IAdapterItemClickListener, IQuotesDaoR
         mMainViewModel.getQuoteReviewById(mPostResponseList?.get(position)?.postId ?: "")
     }
 
-    override fun onQuotesReviewResponse(reviewItem: ReviewResponse?) {
-        Log.d(TAG, "onQuotesReviewResponse: reviewItem :: $reviewItem")
+    override fun onQuotesReviewResponse(reviewItem: ReviewResponse?, quoteId: String) {
+        Log.d(TAG, "onQuotesReviewResponse: quoteId :: $quoteId reviewItem :: $reviewItem")
+        CoroutineScopeUtils().runTaskOnCoroutineMain {
+            val view = LayoutInflater.from(this).inflate(R.layout.review_dialog, null)
+            val dialog = Dialog(this)
+            dialog.apply {
+                setContentView(view)
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                view?.run {
+                    val reviewEditText: EditText = findViewById(R.id.reviewEditText)
+                    val confirmTextView: TextView = findViewById(R.id.confirmTextView)
+                    reviewEditText.setText(reviewItem?.review)
+                    confirmTextView.setOnClickListener {
+                        val str = reviewEditText.text.toString().trim()
+                        if (isEmpty(str)) {
+                            reviewEditText.apply {
+                                requestFocus()
+                                error = context.getString(R.string.mandatory_message)
+                                return@setOnClickListener
+                            }
+                        }
+                        val review: ReviewResponse = ReviewResponse().apply {
+                            this.postId = quoteId
+                            this.review = str
+                        }
+                        if (isEmpty(review.postId) || isEmpty(review.review)) return@setOnClickListener
+                        mMainViewModel.insertQuoteReview(review)
+                        (this@apply).dismiss()
+                    }
+                }
+            }.show()
+        }
+    }
+
+    override fun onInsertQuotesReviewResponse() {
+        Toast.makeText(this, "Successfully entered in the database", Toast.LENGTH_SHORT).show()
     }
 
 }
