@@ -3,12 +3,13 @@ package com.mehul.interviewapplication.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mehul.interviewapplication.interfaces.IQuotesDaoResponse
 import com.mehul.interviewapplication.model.QuoteResponse
 import com.mehul.interviewapplication.model.ResultsItemResponse
 import com.mehul.interviewapplication.repository.QuoteRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val mRepository: QuoteRepository): ViewModel() {
+class MainViewModel(private val mRepository: QuoteRepository, private val mDaoItemResponse: IQuotesDaoResponse) : ViewModel() {
 
     val mQuotesList: LiveData<ArrayList<ResultsItemResponse>>
     get() = mRepository.mQuotes
@@ -28,6 +29,12 @@ class MainViewModel(private val mRepository: QuoteRepository): ViewModel() {
     fun getLocalQuotes() {
         viewModelScope.launch {
             mRepository.getLocalQuotes()
+        }
+    }
+
+    fun getQuoteReviewById(id: String) {
+        viewModelScope.launch {
+            mRepository.getQuoteReviewById(id, mDaoItemResponse)
         }
     }
 

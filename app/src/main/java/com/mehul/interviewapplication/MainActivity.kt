@@ -3,26 +3,25 @@ package com.mehul.interviewapplication
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.mehul.interviewapplication.adapters.QuotesAdapter
-import com.mehul.interviewapplication.apis.IAppService
-import com.mehul.interviewapplication.apis.RetrofitHelper
 import com.mehul.interviewapplication.constants.isNotEmpty
 import com.mehul.interviewapplication.databinding.ActivityMainBinding
 import com.mehul.interviewapplication.interfaces.IAdapterItemClickListener
+import com.mehul.interviewapplication.interfaces.IQuotesDaoResponse
 import com.mehul.interviewapplication.model.ResultsItemResponse
-import com.mehul.interviewapplication.repository.QuoteRepository
+import com.mehul.interviewapplication.model.ReviewResponse
 import com.mehul.interviewapplication.viewmodels.MainViewModel
 import com.mehul.interviewapplication.viewmodelsfactory.MainViewModelFactory
 
-class MainActivity : AppCompatActivity(), IAdapterItemClickListener {
+class MainActivity : AppCompatActivity(), IAdapterItemClickListener, IQuotesDaoResponse {
 
     private lateinit var mMainViewModel: MainViewModel
     private lateinit var mBinding: ActivityMainBinding
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity(), IAdapterItemClickListener {
         super.onCreate(savedInstanceState)
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         val repository = (application as App).mQuoteRepository
-        mMainViewModel = ViewModelProvider(this, MainViewModelFactory(repository))[MainViewModel::class.java]
+        mMainViewModel = ViewModelProvider(this, MainViewModelFactory(repository, this))[MainViewModel::class.java]
         mMainViewModel.mQuotesList.observe(this, { response ->
             Log.d(TAG, "mMainViewModel.mQuotesList: $response")
             if (1 == mCurrentPageCount) mPostResponseList = ArrayList()
@@ -115,6 +114,11 @@ class MainActivity : AppCompatActivity(), IAdapterItemClickListener {
 
     override fun onAdapterItemClickListener(position: Int) {
         Log.d(TAG, "onAdapterItemClickListener: position :: $position :: item :: ${mPostResponseList?.get(position)}")
+        mMainViewModel.getQuoteReviewById(mPostResponseList?.get(position)?.postId ?: "")
+    }
+
+    override fun onQuotesReviewResponse(reviewItem: ReviewResponse?) {
+        Log.d(TAG, "onQuotesReviewResponse: reviewItem :: $reviewItem")
     }
 
 }

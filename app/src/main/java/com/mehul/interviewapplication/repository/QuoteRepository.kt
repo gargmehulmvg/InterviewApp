@@ -1,11 +1,14 @@
 package com.mehul.interviewapplication.repository
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mehul.interviewapplication.apis.IAppService
 import com.mehul.interviewapplication.db.QuoteDataBase
+import com.mehul.interviewapplication.interfaces.IQuotesDaoResponse
 import com.mehul.interviewapplication.model.QuoteResponse
 import com.mehul.interviewapplication.model.ResultsItemResponse
+import com.mehul.interviewapplication.model.ReviewResponse
 import retrofit2.Response
 
 class QuoteRepository(private val mAppService:IAppService, private val mAppDataBaseService: QuoteDataBase) {
@@ -39,6 +42,13 @@ class QuoteRepository(private val mAppService:IAppService, private val mAppDataB
         val quotesList: ArrayList<ResultsItemResponse> = ArrayList()
         quotesList.addAll(list)
         mLocalQuotesLiveData.postValue(quotesList)
+    }
+
+    suspend fun getQuoteReviewById(id: String, daoItemResponse: IQuotesDaoResponse) {
+        Log.d("MainActivity", "getQuoteReviewById: id :: $id")
+        val reviewResponse = mAppDataBaseService.getQuotesDao().getQuoteReviewById(id)
+        daoItemResponse.onQuotesReviewResponse(reviewResponse)
+
     }
 
 }
