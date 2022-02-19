@@ -7,18 +7,18 @@ import android.view.animation.AnimationUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.mehul.interviewapplication.R
 import com.mehul.interviewapplication.databinding.QuotesItemBinding
-import com.mehul.interviewapplication.model.ResultsItem
+import com.mehul.interviewapplication.model.ResultsItemResponse
 
 class QuotesAdapter(
     private var mContext: Context?,
-    private var mList: ArrayList<ResultsItem?>?
+    private var mList: ArrayList<ResultsItemResponse?>?
 ) : RecyclerView.Adapter<QuotesAdapter.QuotesViewHolder>() {
 
     inner class QuotesViewHolder(val viewDataBinding: QuotesItemBinding) : RecyclerView.ViewHolder(viewDataBinding.root)
 
     private var mLastUpdatedPosition = -1
 
-    fun updateDataSource(list: ArrayList<ResultsItem?>?) {
+    fun updateDataSource(list: ArrayList<ResultsItemResponse?>?) {
         this.mList = list
         notifyDataSetChanged()
     }

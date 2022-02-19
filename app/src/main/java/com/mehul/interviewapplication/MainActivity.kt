@@ -1,12 +1,10 @@
 package com.mehul.interviewapplication
 
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.SyncStateContract
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.databinding.DataBindingUtil
@@ -16,8 +14,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mehul.interviewapplication.adapters.QuotesAdapter
 import com.mehul.interviewapplication.apis.IAppService
 import com.mehul.interviewapplication.apis.RetrofitHelper
+import com.mehul.interviewapplication.constants.isNotEmpty
 import com.mehul.interviewapplication.databinding.ActivityMainBinding
-import com.mehul.interviewapplication.model.ResultsItem
+import com.mehul.interviewapplication.model.ResultsItemResponse
 import com.mehul.interviewapplication.repository.QuoteRepository
 import com.mehul.interviewapplication.viewmodels.MainViewModel
 import com.mehul.interviewapplication.viewmodelsfactory.MainViewModelFactory
@@ -30,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private var mCurrentPageCount = 1
     private var mTotalPageCount = 0
     private var mProgressDialog: Dialog? = null
-    private var mPostResponseList: ArrayList<ResultsItem?>? = ArrayList()
+    private var mPostResponseList: ArrayList<ResultsItemResponse?>? = ArrayList()
 
     companion object {
         private const val TAG = "MainActivity"
@@ -38,21 +37,25 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
-        val quoteService = RetrofitHelper.getInstance().create(IAppService::class.java)
-        val repository = QuoteRepository(quoteService)
+        val repository = (application as App).mQuoteRepository
         mMainViewModel = ViewModelProvider(this, MainViewModelFactory(repository))[MainViewModel::class.java]
-
-        showProgressDialog()
-
         mMainViewModel.mQuotesList.observe(this, { response ->
+            Log.d(TAG, "mMainViewModel.mQuotesList: $response")
             if (1 == mCurrentPageCount) mPostResponseList = ArrayList()
-            mTotalPageCount = response.totalPages ?: 1
-            mPostResponseList?.addAll(response.results ?: ArrayList())
-            mQuotesAdapter?.updateDataSource(mPostResponseList)
+            mPostResponseList?.addAll(response ?: ArrayList())
+            if (isNotEmpty(mPostResponseList)) mQuotesAdapter?.updateDataSource(mPostResponseList)
             stopProgress()
+        })
+        mMainViewModel.mTotalQuotesPageNumber.observe(this, { totalPageCount ->
+            Log.d(TAG, "mMainViewModel.mTotalQuotesPageNumber: $totalPageCount")
+            mTotalPageCount = totalPageCount ?: 1
+        })
+        mMainViewModel.mLocalQuotesList.observe(this, { localQuotesList ->
+            Log.d(TAG, "mMainViewModel.mLocalQuotesList: $localQuotesList")
+            mPostResponseList?.addAll(localQuotesList ?: ArrayList())
+            if (isNotEmpty(mPostResponseList)) mQuotesAdapter?.updateDataSource(mPostResponseList)
+            mMainViewModel.getQuotes(mCurrentPageCount)
         })
         setupRecyclerView()
     }
@@ -62,13 +65,12 @@ class MainActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@MainActivity)
             mQuotesAdapter = QuotesAdapter(this@MainActivity, null)
             adapter = mQuotesAdapter
-
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (!recyclerView.canScrollVertically(1) && RecyclerView.SCROLL_STATE_IDLE == newState) {
-                        if (mTotalPageCount != mCurrentPageCount) {
+                        if (mCurrentPageCount < mTotalPageCount) {
                             mCurrentPageCount++
                             showProgressDialog()
                             mMainViewModel.getQuotes(mCurrentPageCount)
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
-
+            mMainViewModel.getLocalQuotes()
         }
     }
 

@@ -3,21 +3,42 @@ package com.mehul.interviewapplication.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.mehul.interviewapplication.apis.IAppService
+import com.mehul.interviewapplication.db.QuoteDataBase
 import com.mehul.interviewapplication.model.QuoteResponse
+import com.mehul.interviewapplication.model.ResultsItemResponse
 import retrofit2.Response
 
-class QuoteRepository(private val mAppService:IAppService) {
+class QuoteRepository(private val mAppService:IAppService, private val mAppDataBaseService: QuoteDataBase) {
 
-    private val mQuotesLiveData = MutableLiveData<QuoteResponse>()
+    private val mQuotesLiveData = MutableLiveData<ArrayList<ResultsItemResponse>>()
+    private val mLocalQuotesLiveData = MutableLiveData<ArrayList<ResultsItemResponse>>()
+    private val mTotalQuotesPageSizeLiveData = MutableLiveData<Int>()
 
-    val mQuotes: LiveData<QuoteResponse>
+    val mQuotes: LiveData<ArrayList<ResultsItemResponse>>
     get() = mQuotesLiveData
+
+    val mLocalQuotes: LiveData<ArrayList<ResultsItemResponse>>
+    get() = mLocalQuotesLiveData
+
+    val mTotalQuotesPageSize: LiveData<Int>
+    get() = mTotalQuotesPageSizeLiveData
 
     suspend fun getQuotes(pageNumber: Int = 1) {
         val result: Response<QuoteResponse> = mAppService.getAllQuotes(pageNumber)
         result.body()?.let { body ->
-            mQuotesLiveData.postValue(body)
+            body.results.let { list -> mAppDataBaseService.getQuotesDao().insertQuote(list) }
+            val quotesList: ArrayList<ResultsItemResponse> = ArrayList()
+            quotesList.addAll(body.results)
+            mQuotesLiveData.postValue(quotesList)
+            mTotalQuotesPageSizeLiveData.postValue(result.body()?.totalPages ?: 1)
         }
+    }
+
+    suspend fun getLocalQuotes() {
+        val list = mAppDataBaseService.getQuotesDao().getAllQuote()
+        val quotesList: ArrayList<ResultsItemResponse> = ArrayList()
+        quotesList.addAll(list)
+        mLocalQuotesLiveData.postValue(quotesList)
     }
 
 }
