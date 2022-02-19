@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), IAdapterItemClickListener, IQuotesDaoR
             layoutManager = LinearLayoutManager(this@MainActivity)
             mQuotesAdapter = QuotesAdapter(this@MainActivity, null, this@MainActivity)
             adapter = mQuotesAdapter
+
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
 
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity(), IAdapterItemClickListener, IQuotesDaoR
                     }
                 }
             })
+
             mMainViewModel.getLocalQuotes()
         }
     }

@@ -45,7 +45,6 @@ class QuoteRepository(private val mAppService:IAppService, private val mAppDataB
     }
 
     suspend fun getQuoteReviewById(id: String, daoItemResponse: IQuotesDaoResponse) {
-        Log.d("MainActivity", "getQuoteReviewById: id :: $id")
         val reviewResponse = mAppDataBaseService.getQuotesDao().getQuoteReviewById(id)
         daoItemResponse.onQuotesReviewResponse(reviewResponse, id)
     }
